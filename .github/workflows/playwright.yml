@@ -16,22 +16,18 @@ jobs:
         with:
           node-version: '18.x'
  
-      - name: Install dependencies and browsers
-        run: |
-          npm install
-          npx playwright install
+      - name: Install dependencies
+        run: npm install
+ 
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
  
       - name: Run Playwright Tests
         run: npx playwright test
  
-      - name: Generate HTML report
-        run: |
-          npx playwright show-report > report.html
-          mkdir -p reports
-          mv report.html reports/
- 
-      - name: Upload Report as Artifact
-        uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
+        if: always()
         with:
           name: playwright-report
-          path: reports/
+          path: playwright-report/
+          retention-days: 30
