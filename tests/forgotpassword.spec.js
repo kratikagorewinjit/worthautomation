@@ -1,60 +1,69 @@
 const { test, expect } = require('@playwright/test');
-const { link } = require('fs');
+const { url } = require('inspector');
 const { chromium } = require('playwright');
 
-//Define a common function with common steps
+// Define a function with common steps
 async function commonSteps(page) {
-await page.goto('https://admin.dev.joinworth.com/');
-await page.getByRole('link', { name: 'Forgot password?' }).click();
-await page.getByPlaceholder('Email address').click();
+  await page.goto('https://app.dev.joinworth.com/');
+  await page.getByRole('link', { name: 'GET MY SCORE' }).click();
+  await page.getByRole('link', { name: 'CONTINUE WITH EMAIL' }).click();
+  await page.getByLabel('Email ID').click();
+  await page.getByLabel('Email ID').fill('kratikagore@gmail.com');
+  await page.waitForTimeout(3000);
+  await page.getByRole('button', { name: 'CONTINUE' }).click();
+  await page.getByRole('link', { name: 'Forgot password?' }).click();
 }
 
-//Test case 1 --Reset password with valid email id
-test ('Test Case 1',async ({page}) => {
-commonSteps (page);
-await page.waitForTimeout(3000);
-await page.fill('#email', 'kratika.gore@joinworth.com');
-await page.getByRole('button', { name: 'SEND' }).click();
+//Test Case 1 --Proceeding to forgot password with blank email
+test ('Test Case 1', async ({page}) => {
+await commonSteps (page);
+await page.fill ('#email', '');
+await page.getByRole('button', { name: 'CONTINUE' }).click();
+const error =await page.error();
+console.error('page error:', error,message);
 await page.pause();
 });
 
-//Test Case 2 --Reset password with invalid email id
-test ('Test Case 2', async ({page}) => {
-commonSteps (page);
-await page.waitForTimeout(3000);
-await page.fill('#email', 'kratika.gore@joinworth.');
-await page.getByRole('button', { name: 'SEND' }).click();
-await page.screenshot({ path: 'login-screenshot1.png' });
-await page.pause();
-});
-
-//Test Case 3 --Reset password with blank email id
-test ('Test Case 3', async ({page}) => {
-commonSteps (page);
-await page.waitForTimeout(3000);
-await page.fill('#email', '');
-await page.getByRole('button', { name: 'SEND' }).click();
-await page.screenshot({ path: 'login-screenshot2.png' });
-await page.pause();
-});
-
-//Test Case 4 --Hit the verification link from email
-test ('Test Case 4', async ({page}) => {
-//commonSteps (page);
-await page.waitForTimeout(3000);
-const verificationLink = 'https://admin.dev.joinworth.com/reset-password?token=eyJhbGciOiJIUzI1NiJ9.VTJGc2RHVmtYMTl3RUt1V1lndkhDbGpTSGRhTHkyVllQMzNBTVJtdUZUeTBrY2M2dDRZQU5lWW1NeWw4UFNNQVh5S0VZRDc5Z0lSVWRqT1dQNXhEV013aHpkSytwaDlqdGJyYjIwQTc1S2V3N2x2c2VBMGJPVytQd0dhWnAwR25wY2M5UVFMZ0lPSmo5bjRWUTVaaWpUd002eFozS0ZlTmg2ME1iVG9jYjFwcHR3ODR5OUY4ejR0d3BnLzFXYytvM2grM1ByelkxbDlYMWJpUTBVbjJ0Zz09.nulmDrcX7ZbrtD_tCohXWNlSJENe9OizCIzHmIxgPSU'; // Replace with a valid link
-  console.log('Verification Link:', verificationLink);
-  // Step 3: Navigate to Verification Link
-  await page.goto(verificationLink);
-  const content = await page.content();
-if (content.includes('Set new password')) {
-    console.log ("Valid verification link");
-    await page.waitForTimeout(3000);
-    await page.fill('#newPassword', 'Winjit@12345');
-  await page.fill('#confirmPassword', 'Winjit@12345');
-  await page.getByRole('button', { name: 'Save' }).click();
-} else {
-    console.log ("Verification link has expired")
-}
+// const errormessageElement = await page1.getByText ('Email is Required');
+// const errormessage = await errormessageElement.textContent();
+//   if (errormessage ==='Email is Required') {
+//     console.log ('Test case Pass')
+//   } else {
+//     console.log ('Test case fail')
+//   }
+ 
   
+//Test Case 2 --Proceeding to forgot password with invalid email
+test ('Test Case 2',async ({page}) => {
+await commonSteps (page);
+await page.fill ('#email', 'kratika.gore@joinworth.');
+await page.getByRole('button', { name: 'CONTINUE' }).click();
+const error =await page.error();
+console.error('page error:', error,message);
+await page.pause();
 });
+
+// const errormessageElement1 = await page2.getByText ('Invalid email');
+// const errormessage1 = await errormessageElement1.textContent();
+//   if (errormessage1 ==='Invalid email') {
+//     console.log ('Test case Pass')
+//   } else {
+//     console.log ('Test case fail')
+//   }
+  
+ //Test Case 3 --Proceeding to forgot password with valid email
+ test ('Test Case 3', async ({page}) => {
+await commonSteps (page);
+await page.fill ('#email', 'kratika.gore+79@joinworth.com');
+await page.getByRole('button', { name: 'CONTINUE' }).click();
+await page.waitForTimeout(3000);
+const url =await page.url ();
+if (url =='https://app.dev.joinworth.com/login/reset-password') {
+  console.log ('pass');
+}
+else {
+  console.log ('fail');
+}
+await page.pause();
+});
+
